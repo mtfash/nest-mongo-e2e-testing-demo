@@ -49,15 +49,23 @@ describe('POST /api/v1/tasks', () => {
       });
   });
 
-  it('should returns a 400 status code for input', () => {
-    const task = {};
-
+  it('should returns a 400 status code for invalid input with proper messages', () => {
     return request(app.getHttpServer())
       .post('/api/v1/tasks')
-      .send(task)
+      .send({})
       .expect(400)
       .then((res) => {
-        console.log(res.body);
+        const messages = [
+          'name should not be empty',
+          'priority should not be empty',
+          'done should not be empty',
+          'done must be a boolean value',
+        ];
+        expect(res.body.message).toBeDefined();
+        expect(Array.isArray(res.body.message)).toBeTruthy();
+        messages.forEach((msg) =>
+          expect(res.body.message.includes(msg)).toBeTruthy(),
+        );
       });
   });
 });
