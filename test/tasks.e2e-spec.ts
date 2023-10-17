@@ -7,7 +7,7 @@ import { AppModule } from '../src/app.module';
 let app: INestApplication;
 let DB: typeof mongoose;
 
-beforeAll(async () => {
+beforeEach(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
@@ -21,7 +21,7 @@ beforeAll(async () => {
   await DB.connection.db.dropDatabase();
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await DB.connection.db.dropDatabase();
   await mongoose.disconnect();
   await app.close();
