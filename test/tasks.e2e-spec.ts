@@ -43,6 +43,9 @@ describe('Tasks e2e', () => {
       .then((res) => {
         expect(res.body._id).toBeDefined();
         expect(res.body.name).toEqual(task.name);
+        expect(res.body.description).toEqual(task.description);
+        expect(res.body.priority).toEqual(task.priority);
+        expect(res.body.done).toEqual(task.done);
       });
   });
 });
