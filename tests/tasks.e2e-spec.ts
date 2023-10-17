@@ -1,6 +1,6 @@
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import mongoose from 'mongoose';
 import { AppModule } from '../src/app.module';
 
@@ -27,15 +27,15 @@ afterEach(async () => {
   await app.close();
 });
 
-describe('Tasks e2e', () => {
-  const task = {
-    name: 'Create github repository',
-    description: 'Create a github repository for the tasks manager application',
-    priority: 'high',
-    done: false,
-  };
+describe('POST /api/v1/tasks', () => {
+  it('should create and return the task in the response', () => {
+    const task = {
+      name: 'Task title goes here',
+      description: 'Task description goes here',
+      priority: 'high',
+      done: false,
+    };
 
-  it('(POST) - create a new task', () => {
     return request(app.getHttpServer())
       .post('/api/v1/tasks')
       .send(task)
@@ -46,6 +46,18 @@ describe('Tasks e2e', () => {
         expect(res.body.description).toEqual(task.description);
         expect(res.body.priority).toEqual(task.priority);
         expect(res.body.done).toEqual(task.done);
+      });
+  });
+
+  it('should returns a 400 status code for input', () => {
+    const task = {};
+
+    return request(app.getHttpServer())
+      .post('/api/v1/tasks')
+      .send(task)
+      .expect(400)
+      .then((res) => {
+        console.log(res.body);
       });
   });
 });

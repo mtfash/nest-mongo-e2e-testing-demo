@@ -1,15 +1,26 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { config } from 'dotenv';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 
-config();
+const { NODE_ENV } = process.env;
+const envFilePath = NODE_ENV === 'test' ? '.env.test' : '.env';
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.DB_URI), TasksModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath,
+    }),
+    MongooseModule.forRoot(process.env.DB_URI),
+    TasksModule,
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}
