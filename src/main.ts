@@ -18,6 +18,7 @@ async function bootstrap() {
 
   const validationOptions: ValidationPipeOptions = {
     transform: true,
+    whitelist: true,
     transformOptions: {
       enableImplicitConversion: true,
     },

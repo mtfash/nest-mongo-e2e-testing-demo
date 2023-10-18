@@ -1,4 +1,10 @@
-import { INestApplication, VersioningType } from '@nestjs/common';
+import {
+  HttpStatus,
+  INestApplication,
+  ValidationPipe,
+  ValidationPipeOptions,
+  VersioningType,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import mongoose from 'mongoose';
@@ -15,6 +21,17 @@ beforeEach(async () => {
   app = moduleFixture.createNestApplication();
   app.setGlobalPrefix('api');
   app.enableVersioning({ type: VersioningType.URI });
+
+  const validationOptions: ValidationPipeOptions = {
+    transform: true,
+    whitelist: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+  };
+  app.useGlobalPipes(new ValidationPipe(validationOptions));
+
   await app.init();
 
   DB = await mongoose.connect(process.env.DB_URI);
@@ -27,6 +44,18 @@ afterEach(async () => {
   await app.close();
 });
 
+describe('GET /api/v1/tasks', () => {
+  it('should return an array of tasks', async () => {
+    const server = app.getHttpServer();
+    request(server)
+      .get('/api/v1/tasks')
+      .expect(200)
+      .then((res) => {
+        expect(Array.isArray(res.body)).toBeTruthy();
+      });
+  });
+});
+
 describe('POST /api/v1/tasks', () => {
   it('should create and return the task in the response', () => {
     const task = {
@@ -36,7 +65,7 @@ describe('POST /api/v1/tasks', () => {
       done: false,
     };
 
-    return request(app.getHttpServer())
+    request(app.getHttpServer())
       .post('/api/v1/tasks')
       .send(task)
       .expect(201)
@@ -50,7 +79,7 @@ describe('POST /api/v1/tasks', () => {
   });
 
   it('should returns a 400 status code for invalid input with proper messages', () => {
-    return request(app.getHttpServer())
+    request(app.getHttpServer())
       .post('/api/v1/tasks')
       .send({})
       .expect(400)
