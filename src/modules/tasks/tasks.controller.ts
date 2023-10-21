@@ -9,7 +9,7 @@ export class TasksController {
 
   @Get()
   async getAllTasks(): Promise<Task[]> {
-    return await this.tasksService.findAll();
+    return await this.tasksService.getTasks();
   }
 
   @Post()
