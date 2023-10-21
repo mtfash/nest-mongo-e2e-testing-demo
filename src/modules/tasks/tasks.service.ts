@@ -11,6 +11,10 @@ export class TasksService {
     return this.tasksRepository.find({});
   }
 
+  async getTaskById(id: string): Promise<Task> {
+    return this.tasksRepository.findOne({ id });
+  }
+
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
     const { name, description, priority, done } = createTaskDto;
     return await this.tasksRepository.create({
